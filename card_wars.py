@@ -83,10 +83,84 @@ class Player:
         drawn_card = self.hand.remove_card()
         print ("{} has placed: {}".format(self.name, drawn_card))
         print("\n")
+        return drawn_card
 
+    def remove_war_cards(self):
+
+        war_cards = []
+        if len(self.hand.cards) < 3:
+            return self.hand.cards
+        else:
+            for x in range(3):
+                war_cards.append(self.hand.remove_card())
+            return war_cards
+
+    def stil_has_cards(self):
+
+        """
+
+        :return: true if player still has cards
+
+        """
+        return len(self.hand.cards) != 0
 ######################
 #### GAME PLAY #######
 ######################
 print("Welcome to War, let's begin...")
 
 # Use the 3 classes along with some logic to play a game of war!
+
+
+# Create a new deck and split it in half
+d = Deck()
+d.shuffle()
+half1, half2 = d.split_in_half()
+
+comp = Player("computer", Hand(half1))
+
+name = input("What is your name?")
+user = Player(name, Hand(half2))
+
+total_rounds = 0
+war_count = 0
+
+while user.stil_has_cards() and comp.stil_has_cards():
+    total_rounds += 1
+    print("Time for a new round!")
+    print("Here are the current standings")
+    print(user.name + " has the count: " + str(len(user.hand.cards)))
+    print(comp.name + " has the count: " + str(len(comp.hand.cards)))
+    print("play a card")
+    print("\n")
+
+    table_cards = []
+    c_card = comp.play_card()
+    p_card = user.play_card()
+
+    table_cards.append(c_card)
+    table_cards.append(p_card)
+
+    if c_card[1] == p_card[1]:
+        war_count += 1
+        print("War!")
+
+        table_cards.extend(user.remove_war_cards())
+        table_cards.extend(comp.remove_war_cards())
+
+        if RANKS.index(c_card[1]) < RANKS.index(p_card[1]):
+            user.hand.add(table_cards)
+        else:
+            comp.hand.add(table_cards)
+
+    else:
+        if RANKS.index(c_card[1]) < RANKS.index(p_card[1]):
+            user.hand.add(table_cards)
+        else:
+            comp.hand.add(table_cards)
+
+print("game over, number of rounds: " + str(total_rounds))
+print("war happened " + str(war_count) + " times")
+print("Does the computer still have cards?")
+print(str(comp.stil_has_cards()))
+print("Does user still have cards?")
+print(str(user.stil_has_cards()))
